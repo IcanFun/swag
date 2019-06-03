@@ -1003,11 +1003,11 @@ func (parser *Parser) parseField(field *ast.Field) (*structField, error) {
 		}
 
 		for _, e := range strings.Split(enumsTag, ",") {
-			structField.enums = append(structField.enums, defineType(enumType, e))
+			structField.enums = append(structField.enums, defineType(enumType, e,""))
 		}
 	}
 	if defaultTag := structTag.Get("default"); defaultTag != "" {
-		structField.defaultValue = defineType(structField.schemaType, defaultTag)
+		structField.defaultValue = defineType(structField.schemaType, defaultTag,"")
 	}
 
 	if IsNumericType(structField.schemaType) || IsNumericType(structField.arrayType) {

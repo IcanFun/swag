@@ -21,7 +21,7 @@ var (
 
 // AddAccount example
 type AddAccount struct {
-	Name string `json:"name" example:"account name"`
+	Name string `json:"name" example:"account name"`  //aaa
 }
 
 // Validation example

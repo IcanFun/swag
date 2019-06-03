@@ -65,7 +65,7 @@ func (c *Controller) ListAccounts(ctx *gin.Context) {
 // @Tags accounts
 // @Accept  json
 // @Produce  json
-// @Param account body model.AddAccount true "Add account"
+// @Param account body model.AddAccount true "Add account" default({})
 // @Success 200 {object} model.Account
 // @Failure 400 {object} httputil.HTTPError
 // @Failure 404 {object} httputil.HTTPError

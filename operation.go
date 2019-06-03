@@ -153,7 +153,7 @@ func (operation *Operation) ParseParamComment(commentLine string, astFile *ast.F
 		return fmt.Errorf("%s is not supported paramType", paramType)
 	}
 
-	if err := operation.parseAndExtractionParamAttribute(commentLine, schemaType, &param); err != nil {
+	if err := operation.parseAndExtractionParamAttribute(commentLine, schemaType,paramType, &param); err != nil {
 		return err
 	}
 	operation.Operation.Parameters = append(operation.Operation.Parameters, param)
@@ -220,7 +220,7 @@ var regexAttributes = map[string]*regexp.Regexp{
 	"format": regexp.MustCompile(`(?i)format\(.*\)`),
 }
 
-func (operation *Operation) parseAndExtractionParamAttribute(commentLine, schemaType string, param *spec.Parameter) error {
+func (operation *Operation) parseAndExtractionParamAttribute(commentLine, schemaType,paramType string, param *spec.Parameter) error {
 	schemaType = TransToValidSchemeType(schemaType)
 	for attrKey, re := range regexAttributes {
 		switch attrKey {
@@ -231,7 +231,7 @@ func (operation *Operation) parseAndExtractionParamAttribute(commentLine, schema
 			}
 			for _, e := range enums {
 				e = strings.TrimSpace(e)
-				param.Enum = append(param.Enum, defineType(schemaType, e))
+				param.Enum = append(param.Enum, defineType(schemaType, e,""))
 			}
 		case "maxinum":
 			attr, err := findAttr(re, commentLine)
@@ -260,11 +260,14 @@ func (operation *Operation) parseAndExtractionParamAttribute(commentLine, schema
 			}
 			param.Minimum = &n
 		case "default":
+			if schemaType == "model.AddAccount" {
+				fmt.Print("model.AddAccount")
+			}
 			attr, err := findAttr(re, commentLine)
 			if err != nil {
 				break
 			}
-			param.Default = defineType(schemaType, attr)
+			param.Default = defineType(schemaType, attr,paramType)
 		case "maxlength":
 			attr, err := findAttr(re, commentLine)
 			if err != nil {
@@ -321,7 +324,7 @@ func findAttrList(re *regexp.Regexp, commentLine string) ([]string, error) {
 }
 
 // defineType enum value define the type (object and array unsupported)
-func defineType(schemaType string, value string) interface{} {
+func defineType(schemaType string, value string, paramType string) interface{} {
 	schemaType = TransToValidSchemeType(schemaType)
 	switch schemaType {
 	case "string":
@@ -345,6 +348,9 @@ func defineType(schemaType string, value string) interface{} {
 		}
 		return v
 	default:
+		if paramType == "body" {
+			return value
+		}
 		panic(fmt.Errorf("%s is unsupported type in enum value", schemaType))
 	}
 }
